@@ -1,27 +1,55 @@
 import React, { Component } from 'react';
+import CardList from './components/CardList';
+import SearchBox from './components/SearchBox';
+import CategoriesList from './components/CategoriesList';
 import logo from './logo.svg';
 import './App.css';
 
-class App extends Component {
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      items: [],
+      searchfield: '',
+      category: 'none'
+    }
+  }
+
+  fetchDataFromAPI(url) {
+    fetch(url)
+      .then(response => {
+        return response.json();
+      }).then(users => {
+        this.setState( {items: users});
+      })
+  }
+
+  onSearchChange = (event) => {
+    this.setState({ searchfield: event.target.value })
+  }
+
   render() {
+    const { items, searchfield, category } = this.state;
+    const filteredItems = items.filter(item => {
+      return item.name.toLowerCase().includes(searchfield.toLowerCase());
+    });
+
+    var pageData;
+    if (category === 'none')
+      pageData = (<div><h3 className='f3'>Please select a category of item</h3></div>);
+    else
+      pageData = (<div>
+                  <SearchBox searchChange={this.onSearchChange} />
+                  <CardList items={ filteredItems } />
+                </div>);
+
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div className='tc'>
+        <h1 className='f1'>StarWars Library</h1>
+        <CategoriesList />
+        {pageData}
       </div>
-    );
+      )
   }
 }
 
