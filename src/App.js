@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import CardList from './components/CardList';
 import SearchBox from './components/SearchBox';
 import CategoriesList from './components/CategoriesList';
-import logo from './logo.svg';
 import './App.css';
 
 class App extends React.Component {
@@ -13,14 +12,31 @@ class App extends React.Component {
       searchfield: '',
       category: 'none'
     }
+
+    this.fetchCategory = this.fetchCategory.bind(this);
+    this.fetchDataFromAPI = this.fetchDataFromAPI.bind(this);
+  }
+
+  fetchCategory(category) {
+    var url = 'https://swapi.co/api/' + category
+    console.log(url)
+    this.setState({items: []});
+    this.fetchDataFromAPI(url)
   }
 
   fetchDataFromAPI(url) {
     fetch(url)
       .then(response => {
         return response.json();
-      }).then(users => {
-        this.setState( {items: users});
+      }).then((data) => {
+        var itemsList = this.state.items;
+        console.log("data", data.results);
+        for (var i=0; i<data.count; i++)
+          itemsList.push(data.results[i]);
+        console.log("itemsList", itemsList);
+        this.setState({items: itemsList});
+        if (data.next)
+          this.fetchDataFromAPI(data.next)
       })
   }
 
@@ -31,7 +47,7 @@ class App extends React.Component {
   render() {
     const { items, searchfield, category } = this.state;
     const filteredItems = items.filter(item => {
-      return item.name.toLowerCase().includes(searchfield.toLowerCase());
+      return item.title.toLowerCase().includes(searchfield.toLowerCase());
     });
 
     var pageData;
@@ -46,7 +62,7 @@ class App extends React.Component {
     return (
       <div className='tc'>
         <h1 className='f1'>StarWars Library</h1>
-        <CategoriesList />
+        <CategoriesList fetchFunction={this.fetchCategory} />
         {pageData}
       </div>
       )
