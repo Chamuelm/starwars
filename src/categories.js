@@ -1,10 +1,10 @@
 const categories = [
   'planets',
-  'spaceships',
+  'starships',
   'vehicles',
   'people',
   'films',
-  'Species'
+  'species'
 ];
 
 export default categories;

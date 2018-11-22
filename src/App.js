@@ -2,6 +2,7 @@ import React from 'react';
 import CardList from './components/CardList';
 import SearchBox from './components/SearchBox';
 import CategoriesList from './components/CategoriesList';
+import Popup from './components/Popup';
 import './App.css';
 
 class App extends React.Component {
@@ -10,18 +11,37 @@ class App extends React.Component {
     this.state = {
       items: [],
       searchfield: '',
-      category: 'none'
+      categories: null,
+      category: 'none',
+      showPopup: false,
+      popupElement: null
     }
 
     this.fetchCategory = this.fetchCategory.bind(this);
     this.fetchDataFromAPI = this.fetchDataFromAPI.bind(this);
+    this.rerender = this.forceUpdate.bind(this);
+  }
+
+  closePopup = () => {
+    this.setState({
+      showPopup: false
+    });
+  }
+
+  popupFill = (name, item) => {
+    this.setState({
+      popupElement: <Popup name={name} item={item} closePopupFunc={this.closePopup} />,
+      showPopup: true
+    });
   }
 
   fetchCategory(category) {
-    var url = 'https://swapi.co/api/' + category
-    console.log(url)
-    this.setState({items: []});
-    this.fetchDataFromAPI(url)
+    var url = this.state.categories[category];
+    this.setState({
+      items: [],
+      category: category
+    });
+    this.fetchDataFromAPI(url);
   }
 
   fetchDataFromAPI(url) {
@@ -30,14 +50,26 @@ class App extends React.Component {
         return response.json();
       }).then((data) => {
         var itemsList = this.state.items;
-        console.log("data", data.results);
-        for (var i=0; i<data.count; i++)
+        for (var i=0; i<data.results.length; i++)
           itemsList.push(data.results[i]);
-        console.log("itemsList", itemsList);
         this.setState({items: itemsList});
         if (data.next)
           this.fetchDataFromAPI(data.next)
       })
+  }
+
+  fetchCategoriesList() {
+    fetch('https://swapi.co/api/')
+    .then(response => {
+          return response.json();
+        })
+    .then(data => {
+      this.setState({categories : data});
+    });
+  }
+
+  componentDidMount() {
+    this.fetchCategoriesList();
   }
 
   onSearchChange = (event) => {
@@ -45,27 +77,46 @@ class App extends React.Component {
   }
 
   render() {
-    const { items, searchfield, category } = this.state;
+    const { items, searchfield, categories, category } = this.state;
     const filteredItems = items.filter(item => {
-      return item.title.toLowerCase().includes(searchfield.toLowerCase());
+      if (category === "films")
+        return item.title.toLowerCase().includes(searchfield.toLowerCase());
+      else
+        return item.name.toLowerCase().includes(searchfield.toLowerCase());
     });
 
-    var pageData;
-    if (category === 'none')
+    let pageData, showCategories = true;
+    let categoryElement = <CategoriesList categories={this.state.categories} fetchFunction={this.fetchCategory} />;    ;
+    
+    if (!categories) {
+      pageData = (<div><h3 className='f3'>Loading categories...</h3></div>);
+      showCategories = false;
+    } else if (category === 'none') {
       pageData = (<div><h3 className='f3'>Please select a category of item</h3></div>);
-    else
-      pageData = (<div>
-                  <SearchBox searchChange={this.onSearchChange} />
-                  <CardList items={ filteredItems } />
-                </div>);
+    } else if (items.length) {
+      pageData = (
+        <div>
+          <SearchBox searchChange={this.onSearchChange} />
+          <CardList items={filteredItems} cat={category} popupFillFunc={this.popupFill} />
+        </div>
+        );
+    } else {
+      pageData = (<div><h3 className='f3'>Loading...</h3></div>);
+    }
+
+    if (!showCategories)
+      categoryElement = null;
 
     return (
-      <div className='tc'>
-        <h1 className='f1'>StarWars Library</h1>
-        <CategoriesList fetchFunction={this.fetchCategory} />
-        {pageData}
+      <div>
+        <div className='tc'>
+          <h1 className='f1'>StarWars Library</h1>
+          {categoryElement}
+          {pageData}
+        </div>
+        {this.state.showPopup ? this.state.popupElement : null}
       </div>
-      )
+    )
   }
 }
 
