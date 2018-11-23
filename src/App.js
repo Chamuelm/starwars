@@ -39,6 +39,43 @@ class App extends React.Component {
     });
   }
 
+  showPopupOnStart = () => {
+    let item = {
+      "name": "Luke Skywalker", 
+      "height": "172", 
+      "mass": "77", 
+      "hair_color": "blond", 
+      "skin_color": "fair", 
+      "eye_color": "blue", 
+      "birth_year": "19BBY", 
+      "gender": "male", 
+      "homeworld": "https://swapi.co/api/planets/1/", 
+      "films": [
+          "https://swapi.co/api/films/2/", 
+          "https://swapi.co/api/films/6/", 
+          "https://swapi.co/api/films/3/", 
+          "https://swapi.co/api/films/1/", 
+          "https://swapi.co/api/films/7/"
+      ], 
+      "species": [
+          "https://swapi.co/api/species/1/"
+      ], 
+      "vehicles": [
+          "https://swapi.co/api/vehicles/14/", 
+          "https://swapi.co/api/vehicles/30/"
+      ], 
+      "starships": [
+          "https://swapi.co/api/starships/12/", 
+          "https://swapi.co/api/starships/22/"
+      ], 
+      "created": "2014-12-09T13:50:51.644000Z", 
+      "edited": "2014-12-20T21:17:56.891000Z", 
+      "url": "https://swapi.co/api/people/1/"
+    }
+
+    this.popupFill(item.name, item);
+  }
+
   // Fetch data from API of specific category to item list
   // the data is saved in state.items and the chosen category is saved in state.category
   // This method set state.items to empty list and uses helper method fetchDataFromAPI 
@@ -84,6 +121,7 @@ class App extends React.Component {
   // feching categories list after loaded
   componentDidMount() {
     this.fetchCategoriesList();
+    //this.showPopupOnStart();
   }
 
   // change state.searcField when user types
@@ -104,7 +142,9 @@ class App extends React.Component {
 
     let pageData; // Will hold dynamically relevant data (Loading messages/items list&search)
     let showCategories = true; // Dynamically show categories if loaded
-    let categoryElement = <CategoriesList categories={this.state.categories} fetchFunction={this.fetchCategory} />; // Categories list element
+    let showSearchbox = false;
+    let categoryElement = <CategoriesList className='header-data'categories={this.state.categories} fetchFunction={this.fetchCategory} />; // Categories list element
+    let searchboxElement = <SearchBox searchChange={this.onSearchChange} />;
     
     if (!categories) { // Not yet loaded than show loading message
       pageData = (<div><h3 className='f3'>Loading categories...</h3></div>);
@@ -112,12 +152,10 @@ class App extends React.Component {
     } else if (category === 'none') { // Categories has been loaded but user didn't chose one
       pageData = (<div><h3 className='f3'>Please select a category of item</h3></div>);
     } else if (items.length) { // User chose category so display items if has been loaded
+      showSearchbox = true;
       pageData = (
-        <div>
-          <SearchBox searchChange={this.onSearchChange} />
-          <Scroll>
-            <CardList items={filteredItems} cat={category} popupFillFunc={this.popupFill} />
-          </Scroll>
+        <div class='scroll-y'>
+          <CardList items={filteredItems} cat={category} popupFillFunc={this.popupFill} />
         </div>
         );
     } else { // User chose category but not yet loaded so display loading message
@@ -126,14 +164,15 @@ class App extends React.Component {
 
     if (!showCategories) // Dont show categories if not loaded yet
       categoryElement = null;
+    if (!showSearchbox)
+      searchboxElement = null;
 
     return (
-      <div>
-        <div className='tc'>
-          <h1 className='f1'>StarWars Library</h1>
-          {categoryElement}
-          {pageData}
-        </div>
+      <div className='flex flex-column justify-around tc'>
+        <h1 className='f1 flex header-data'>StarWars Library</h1>
+        {categoryElement}
+        {searchboxElement}
+        {pageData}
         {this.state.showPopup ? this.state.popupElement : null}
       </div>
     )

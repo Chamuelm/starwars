@@ -16,17 +16,4 @@ const CardList = (props) => {
 	);
 }
 
-function fetchSchema(category) {
-	let url = 'https://swapi.co/api/' + category + '/schema'
-	let schema = fetch(url)
-      .then(response => {
-        return response.json();
-      })
-      .then((data) => {
-        return data.required;
-      })
-
-    return schema
-}
-
 export default CardList;
