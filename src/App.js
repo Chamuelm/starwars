@@ -121,7 +121,7 @@ class App extends React.Component {
   // feching categories list after loaded
   componentDidMount() {
     this.fetchCategoriesList();
-    //this.showPopupOnStart();
+    this.showPopupOnStart();
   }
 
   // change state.searcField when user types
@@ -169,7 +169,7 @@ class App extends React.Component {
 
     return (
       <div className='flex flex-column justify-around tc'>
-        <h1 className='f1 flex header-data'>StarWars Library</h1>
+        <h1 className='f1 header-data'>StarWars Library</h1>
         {categoryElement}
         {searchboxElement}
         {pageData}
