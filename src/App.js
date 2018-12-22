@@ -3,7 +3,6 @@ import CardList from './components/CardList';
 import SearchBox from './components/SearchBox';
 import CategoriesList from './components/CategoriesList';
 import Popup from './components/Popup';
-import Scroll from './components/Scroll';
 import './App.css';
 
 class App extends React.Component {
@@ -34,7 +33,7 @@ class App extends React.Component {
   //  to the onClick attribute to use it
   popupFill = (name, item) => {
     this.setState({
-      popupElement: <Popup name={name} item={item} closePopupFunc={this.closePopup} />,
+      popupElement: <Popup name={name} item={item} closePopupFunc={this.closePopup} popupFillFunc={this.popupFill} />,
       showPopup: true
     });
   }
@@ -154,7 +153,7 @@ class App extends React.Component {
     } else if (items.length) { // User chose category so display items if has been loaded
       showSearchbox = true;
       pageData = (
-        <div class='scroll-y'>
+        <div className='scroll-y'>
           <CardList items={filteredItems} cat={category} popupFillFunc={this.popupFill} />
         </div>
         );
