@@ -19,6 +19,7 @@ class App extends React.Component {
 
     this.fetchCategory = this.fetchCategory.bind(this);
     this.fetchDataFromAPI = this.fetchDataFromAPI.bind(this);
+    this.setState = this.setState.bind(this);
   }
 
   // Method to close popup if opened
@@ -33,9 +34,15 @@ class App extends React.Component {
   //  to the onClick attribute to use it
   popupFill = (name, item) => {
     this.setState({
-      popupElement: <Popup name={name} item={item} closePopupFunc={this.closePopup} popupFillFunc={this.popupFill} />,
-      showPopup: true
+      popupElement: null
     });
+    this.closePopup();
+    setTimeout(() => {
+      this.setState({
+        popupElement: <Popup name={name} item={item} closePopupFunc={this.closePopup} popupFillFunc={this.popupFill} />,
+        showPopup: true
+      });
+    }, 1000);
   }
 
   showPopupOnStart = () => {

@@ -9,6 +9,11 @@
   margin: auto;
   background-color: rgba(0,0,0, 0.5);
 }
+
+table {
+  display: block;
+}
+
 .popup_inner {
   position: absolute;
   left: 10%;

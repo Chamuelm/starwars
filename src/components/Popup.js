@@ -20,25 +20,26 @@ class Popup extends React.Component {
 			let data = this.state.item[keyName];
 			let temp;
 
-			console.log("data", data);
-
 			for (let i=0; i<this.state.dataToSkip.length; i++){
-				if (keyName == this.state.dataToSkip[i])
+				if (keyName === this.state.dataToSkip[i])
 					return;
 			}
 				
-			
-			if (Array.isArray(data) || data.startsWith("http")) {
-				temp = await fetchDataFromURL(data, this.state.popupFillFunc);
-				console.log("in fetch of", keyName);
-				data = (<CardList items={temp} cat={keyName} popupFillFunc={this.state.popupFillFunc} type="small" />)
+			try {
+				if (Array.isArray(data) || (typeof(data) === "string" && data.startsWith("http"))) {
+					temp = await fetchDataFromURL(data, this.state.popupFillFunc);
+					data = (<CardList items={temp} cat={keyName} popupFillFunc={this.state.popupFillFunc} type="small" />)
+				}
+			} catch(error) {
+				console.log("error in loop: " + error);
 			}
+			
 
 			let updatedTable = this.state.table;
 			updatedTable.push(
 				<tr key={index} className='dt-ro tl'>
-					<td className='dtc ttc'>{ this.state.keys[index].replace('_', ' ') }</td>
-					<td className='dtc' data-th='{thie.state.keys[index]}'>{ data }</td>
+					<td className='dtc ttc v-top'>{ this.state.keys[index].replace('_', ' ') }</td>
+					<td data-th='{thie.state.keys[index]}'>{ data }</td>
 				</tr>
 			);
 			this.setState({table : updatedTable});
@@ -51,7 +52,7 @@ class Popup extends React.Component {
 			<div className='popup'>
 				<div className='popup_inner tc ttc ba bg-black dib br3 pa3 ma2 bw2 yellow shadow-5 flex flex-column items-center'>
 					<h1 className='f1'>{this.props.name}</h1>
-					<table className='dt scroll-y w-90'>
+					<table className='scroll-y w-90'>
 						<tbody>
 							{this.state.table}
 						</tbody>

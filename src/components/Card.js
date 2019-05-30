@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Card = (props) => {
-	if (props.type == 'small') {
+	if (props.type === 'small') {
 		return (
 			<button className='tc ttc ba bg-black dib br3 pa1 ma1 grow bw1 yellow shadow-5 b--yellow' 
 					onClick={()=> props.popupFillFunc(props.name, props.item)}>
